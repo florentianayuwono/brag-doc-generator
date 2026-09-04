@@ -15,6 +15,13 @@ def _config():
     )
 
 
+def test_enabled_treats_empty_key_as_missing(monkeypatch):
+    monkeypatch.setenv("DISCOURSE_API_KEY", "")
+    assert DiscourseFetcher().enabled(_config()) is False
+    monkeypatch.setenv("DISCOURSE_API_KEY", "k")
+    assert DiscourseFetcher().enabled(_config()) is True
+
+
 @responses.activate
 def test_fetch_normalizes_actions(monkeypatch):
     monkeypatch.setenv("DISCOURSE_API_KEY", "k")

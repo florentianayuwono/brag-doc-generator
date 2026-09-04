@@ -24,7 +24,7 @@ class DiscourseFetcher(Fetcher):
         has_cfg = bool(config.identity.get("discourse_username")) and \
             bool(config.identity.get("discourse_base_url"))
         return config.source_enabled(self.name) and \
-            os.environ.get("DISCOURSE_API_KEY") is not None and has_cfg
+            bool(os.environ.get("DISCOURSE_API_KEY")) and has_cfg
 
     def fetch(self, config: Config) -> list[WorkItem]:
         base = config.identity["discourse_base_url"].rstrip("/")

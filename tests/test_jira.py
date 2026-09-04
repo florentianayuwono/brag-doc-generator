@@ -22,6 +22,11 @@ def test_enabled_requires_token(monkeypatch):
     assert JiraFetcher().enabled(_config()) is True
 
 
+def test_enabled_treats_empty_token_as_missing(monkeypatch):
+    monkeypatch.setenv("JIRA_API_TOKEN", "")
+    assert JiraFetcher().enabled(_config()) is False
+
+
 @responses.activate
 def test_fetch_normalizes_issue(monkeypatch):
     monkeypatch.setenv("JIRA_API_TOKEN", "t")

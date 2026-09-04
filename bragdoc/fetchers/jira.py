@@ -21,7 +21,7 @@ class JiraFetcher(Fetcher):
     name = "jira"
 
     def enabled(self, config: Config) -> bool:
-        return config.source_enabled(self.name) and os.environ.get("JIRA_API_TOKEN") is not None
+        return config.source_enabled(self.name) and bool(os.environ.get("JIRA_API_TOKEN"))
 
     def fetch(self, config: Config) -> list[WorkItem]:
         server = config.identity["jira_server"].rstrip("/")
