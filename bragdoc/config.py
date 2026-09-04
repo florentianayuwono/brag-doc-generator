@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 
 import yaml
@@ -15,6 +15,7 @@ class Config:
     github_orgs: list[str]
     main_projects: list[str]
     sources: dict
+    goals: dict = field(default_factory=dict)
 
     def source_enabled(self, name: str) -> bool:
         return bool(self.sources.get(name, False))
@@ -49,4 +50,5 @@ def load_config(config_path: str = "config.yaml", env_path: str = ".env") -> Con
         github_orgs=list(scope.get("github_orgs", [])),
         main_projects=list(scope.get("main_projects", [])),
         sources=raw.get("sources", {}),
+        goals=raw.get("goals", {}),
     )

@@ -62,3 +62,25 @@ def test_source_enabled_requires_toggle(tmp_path):
     assert c.source_enabled("github_prs") is True
     assert c.source_enabled("jira") is False
     assert c.source_enabled("discourse") is False  # absent -> default False
+
+
+def test_goals_default_to_empty_when_absent(tmp_path):
+    cfg, env = _write(tmp_path)
+    c = load_config(str(cfg), str(env))
+    assert c.goals == {}
+
+
+def test_goals_parsed_when_present(tmp_path):
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(CONFIG_YAML + (
+        "goals:\n"
+        '  this_year: "Get promoted to Associate"\n'
+        '  next_year: "Get promoted to Prof 1"\n'
+    ))
+    env = tmp_path / ".env"
+    env.write_text("")
+    c = load_config(str(cfg), str(env))
+    assert c.goals == {
+        "this_year": "Get promoted to Associate",
+        "next_year": "Get promoted to Prof 1",
+    }
