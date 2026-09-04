@@ -5,6 +5,7 @@ import sys
 
 from bragdoc.config import Config
 from bragdoc.fetchers.base import Fetcher
+from bragdoc.linker import link_jira_projects
 from bragdoc.models import WorkItem
 
 
@@ -13,7 +14,7 @@ def _warn(message: str) -> None:
 
 
 def collect(config: Config, fetchers: list[Fetcher]) -> list[WorkItem]:
-    items: list[WorkItem] = []
+    gathered: list[WorkItem] = []
     for fetcher in fetchers:
         if not fetcher.enabled(config):
             _warn(f"skipping '{fetcher.name}' (disabled or missing token/config)")
@@ -23,10 +24,10 @@ def collect(config: Config, fetchers: list[Fetcher]) -> list[WorkItem]:
         except Exception as exc:  # noqa: BLE001 - isolate one source's failure
             _warn(f"'{fetcher.name}' failed: {exc}")
             continue
-        for item in fetched:
-            if config.window_start <= item.date <= config.window_end:
-                items.append(item)
-    return items
+        gathered.extend(fetched)
+
+    linked = link_jira_projects(gathered, config.main_projects)
+    return [item for item in linked if config.window_start <= item.date <= config.window_end]
 
 
 def write_cache(items: list[WorkItem], path: str) -> None:
