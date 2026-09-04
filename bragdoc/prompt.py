@@ -5,12 +5,15 @@ def _goals_line(goals: str) -> str:
     return goals.strip() if goals.strip() else "(not provided — ask me for my goals before writing this section)"
 
 
-def render_prompt(username: str, goals_this_year: str, goals_next_year: str,
+def render_prompt(goals_this_year: str, goals_next_year: str,
                   digest_filename: str) -> str:
     """Build an LLM prompt that turns the raw digest into a brag document.
 
     Follows the template from Julia Evans' "brag documents" post:
     https://jvns.ca/blog/brag-documents/
+
+    This prompt is intentionally generic (no name or specific dates) so it
+    can be reused by anyone, any time they regenerate their digest.
     """
     this_year = _goals_line(goals_this_year)
     next_year = _goals_line(goals_next_year)
@@ -18,7 +21,7 @@ def render_prompt(username: str, goals_this_year: str, goals_next_year: str,
     return f"""\
 # Brag document — writing instructions for the AI
 
-You are helping **{username}** turn a raw work-activity digest into a polished
+You are helping me turn a raw work-activity digest into a polished
 brag document, following the template from Julia Evans' post
 "brag documents" (https://jvns.ca/blog/brag-documents/).
 
@@ -26,8 +29,8 @@ brag document, following the template from Julia Evans' post
 
 The raw digest is attached/pasted below (or in `{digest_filename}`). It lists
 GitHub PRs, reviews, issues, commits, discussions, Jira tickets, Discourse
-posts, and Launchpad activity from the last 6 months, already grouped by
-project vs. cross-team collaboration.
+posts, and Launchpad activity from the configured time window, already
+grouped by project vs. cross-team collaboration.
 
 ## Hard constraints
 

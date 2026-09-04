@@ -45,7 +45,6 @@ def _do_render(config, cache_path: str, output_path: str) -> None:
 def _do_prompt(config, output_path: str) -> None:
     prompt_path = _prompt_path(output_path)
     text = render_prompt(
-        username=config.identity.get("github_username", "me"),
         goals_this_year=config.goals.get("this_year", ""),
         goals_next_year=config.goals.get("next_year", ""),
         digest_filename=os.path.basename(output_path),
