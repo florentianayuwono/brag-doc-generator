@@ -128,8 +128,8 @@ identity:
   jira_email: florentiana.yuwono@canonical.com
   jira_server: https://warthogs.atlassian.net
   discourse_base_url: https://discourse.canonical.com
-  discourse_username: florentianayuwono
-  launchpad_user: florentianayuwono
+  discourse_username: florenyu
+  launchpad_user: florenyu
 
 date_range:
   months_back: 6            # or set explicit start/end to override
@@ -137,9 +137,12 @@ date_range:
 scope:
   github_orgs: [canonical]  # orgs to search authored/review/issue activity in
   main_projects:            # repos that are "yours" -> own Project section
-    - aproxy-operator
+    - github-actions-runner
+    - github-runner-image-builder-operator
     - github-runner-operators
     - github-runner-operator
+    - content-cache-operator
+    - ingress-configurator-operator
   # anything else touched -> Cross-team & collaboration section
 
 sources:                    # explicit on/off per source
