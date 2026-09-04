@@ -44,3 +44,37 @@ def test_render_command_reads_cache_and_writes_output(tmp_path):
     text = out.read_text()
     assert "# Brag Digest — octo" in text
     assert "aproxy-operator" in text
+
+
+def test_render_command_also_writes_companion_prompt_file(tmp_path):
+    cfg, env = _config_files(tmp_path)
+    cache = tmp_path / "cache.json"
+    write_cache([_item()], str(cache))
+    out = tmp_path / "digest.md"
+    rc = main([
+        "render",
+        "--config", str(cfg),
+        "--env", str(env),
+        "--cache", str(cache),
+        "--output", str(out),
+    ])
+    assert rc == 0
+    prompt_path = tmp_path / "digest-prompt.md"
+    assert prompt_path.exists()
+    text = prompt_path.read_text()
+    assert "digest.md" in text
+    assert "1-2 page" in text
+
+
+def test_prompt_command_writes_prompt_without_needing_cache(tmp_path):
+    cfg, env = _config_files(tmp_path)
+    out = tmp_path / "digest.md"
+    rc = main([
+        "prompt",
+        "--config", str(cfg),
+        "--env", str(env),
+        "--output", str(out),
+    ])
+    assert rc == 0
+    prompt_path = tmp_path / "digest-prompt.md"
+    assert prompt_path.exists()

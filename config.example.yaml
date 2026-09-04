@@ -30,3 +30,7 @@ sources:
   jira: true
   discourse: true
   launchpad: true
+
+goals:
+  this_year: ""   # e.g. "Get promoted to Associate"
+  next_year: ""   # e.g. "Get promoted to Prof 1"
