@@ -1,0 +1,32 @@
+identity:
+  github_username: florentianayuwono
+  jira_email: florentiana.yuwono@canonical.com
+  jira_server: https://warthogs.atlassian.net
+  discourse_base_url: https://discourse.canonical.com
+  discourse_username: florenyu
+  launchpad_user: florenyu
+
+date_range:
+  months_back: 6
+  # start: "2026-03-04"   # optional explicit ISO date overrides months_back
+  # end: "2026-09-04"
+
+scope:
+  github_orgs: [canonical]
+  main_projects:
+    - github-actions-runner
+    - github-runner-image-builder-operator
+    - github-runner-operators
+    - github-runner-operator
+    - content-cache-operator
+    - ingress-configurator-operator
+
+sources:
+  github_prs: true
+  github_reviews: true
+  github_issues: true
+  github_commits: true
+  github_discussions: true
+  jira: true
+  discourse: true
+  launchpad: true
