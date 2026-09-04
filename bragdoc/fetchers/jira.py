@@ -30,12 +30,18 @@ class JiraFetcher(Fetcher):
         start = config.window_start.date().isoformat()
         jql = f'assignee = currentUser() AND updated >= "{start}" ORDER BY updated DESC'
         out: list[WorkItem] = []
-        start_at = 0
+        next_page_token: str | None = None
         while True:
-            resp = requests.get(
-                f"{server}/rest/api/3/search",
-                params={"jql": jql, "startAt": start_at, "maxResults": 50,
-                        "fields": "summary,status,updated,project"},
+            body = {
+                "jql": jql,
+                "maxResults": 50,
+                "fields": ["summary", "status", "updated", "project"],
+            }
+            if next_page_token:
+                body["nextPageToken"] = next_page_token
+            resp = requests.post(
+                f"{server}/rest/api/3/search/jql",
+                json=body,
                 auth=(email, token),
                 headers={"Accept": "application/json"},
                 timeout=30,
@@ -56,7 +62,7 @@ class JiraFetcher(Fetcher):
                     identifier=issue["key"],
                     extra={},
                 ))
-            start_at += len(data.get("issues", []))
-            if start_at >= data.get("total", 0) or not data.get("issues"):
+            if data.get("isLast", True) or not data.get("nextPageToken"):
                 break
+            next_page_token = data["nextPageToken"]
         return out

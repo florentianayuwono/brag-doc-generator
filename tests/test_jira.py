@@ -26,8 +26,8 @@ def test_enabled_requires_token(monkeypatch):
 def test_fetch_normalizes_issue(monkeypatch):
     monkeypatch.setenv("JIRA_API_TOKEN", "t")
     responses.add(
-        responses.GET,
-        "https://ex.atlassian.net/rest/api/3/search",
+        responses.POST,
+        "https://ex.atlassian.net/rest/api/3/search/jql",
         json={"issues": [{
             "key": "PS-456",
             "fields": {
@@ -36,7 +36,7 @@ def test_fetch_normalizes_issue(monkeypatch):
                 "updated": "2026-04-10T12:00:00.000+0000",
                 "project": {"key": "PS"},
             },
-        }], "total": 1, "startAt": 0, "maxResults": 50},
+        }], "isLast": True},
         status=200,
     )
     items = JiraFetcher().fetch(_config())
@@ -48,3 +48,40 @@ def test_fetch_normalizes_issue(monkeypatch):
     assert it.state == "Done"
     assert it.url == "https://ex.atlassian.net/browse/PS-456"
     assert it.date == datetime(2026, 4, 10, 12, 0, tzinfo=timezone.utc)
+
+
+@responses.activate
+def test_fetch_paginates_with_next_page_token(monkeypatch):
+    monkeypatch.setenv("JIRA_API_TOKEN", "t")
+    responses.add(
+        responses.POST,
+        "https://ex.atlassian.net/rest/api/3/search/jql",
+        json={"issues": [{
+            "key": "PS-1",
+            "fields": {
+                "summary": "First page issue",
+                "status": {"name": "Done"},
+                "updated": "2026-04-10T12:00:00.000+0000",
+                "project": {"key": "PS"},
+            },
+        }], "isLast": False, "nextPageToken": "abc"},
+        status=200,
+    )
+    responses.add(
+        responses.POST,
+        "https://ex.atlassian.net/rest/api/3/search/jql",
+        json={"issues": [{
+            "key": "PS-2",
+            "fields": {
+                "summary": "Second page issue",
+                "status": {"name": "Done"},
+                "updated": "2026-04-11T12:00:00.000+0000",
+                "project": {"key": "PS"},
+            },
+        }], "isLast": True},
+        status=200,
+    )
+    items = JiraFetcher().fetch(_config())
+    assert [i.identifier for i in items] == ["PS-1", "PS-2"]
+    second_call_body = responses.calls[1].request.body
+    assert b'"abc"' in second_call_body
